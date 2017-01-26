@@ -159,12 +159,99 @@ iprint.df(show_data, scale=TRUE)
 
 **Answers**
 
-*
-*
-*
-*
-*
-*
+* We need 5 factors to explain atleast 50% of the variance in this data
+* 0.93 , 0,87 , 0,86
+* First 10 components can be described as Futures of Bonds ,Currncey, European markets, American markets, European exchange rates, Oil and gas , Metals, Grains, Precious metals, Chinese stocks
+* Answer to Question number 4, By changing the dates in line 167 we can also obtain data for precrisis times(Not done because procedure is the same and only requires copay pasting of the code)
+```{r}
+PreCrisis_data = futures_data[as.Date(rownames(futures_data)) > "2002-11-01" & as.Date(rownames(futures_data)) <"2007-10-01",]
+```
+```{r}
+show_data = round(cor(PreCrisis_data),2)
+iprint.df(show_data, scale=TRUE)
+```
+```{r}
+Variance_Explained_Table_results<-PCA(PreCrisis_data, graph=FALSE)
+Variance_Explained_Table<-Variance_Explained_Table_results$eig
+colnames(Variance_Explained_Table)<-c("Eigenvalue", 
+  "Pct of explained variance", "Cumulative pct of explained variance")
+```
+```{r}
+show_data = round(Variance_Explained_Table, 2)
+iprint.df(show_data)
+```
+```{r}
+eigenvalues  <- Variance_Explained_Table[, "Eigenvalue"]
+```
+```{r}
+df           <- cbind(as.data.frame(eigenvalues), c(1:length(eigenvalues)), rep(1, length(eigenvalues)))
+colnames(df) <- c("eigenvalues", "components", "abline")
+iplot.df(melt(df, id="components"))
+```
+
+
+```{r echo=TRUE, tidy=TRUE}
+corused = cor(futures_data[,apply(futures_data!=0,2,sum) > 10, drop=F])
+Rotated_Results<-principal(corused, nfactors=20, rotate="varimax",score=TRUE)
+Rotated_Factors<-round(Rotated_Results$loadings,2)
+Rotated_Factors<-as.data.frame(unclass(Rotated_Factors))
+colnames(Rotated_Factors)<-paste("comp",1:ncol(Rotated_Factors),sep=" ")
+
+sorted_rows <- sort(Rotated_Factors[,1], decreasing = TRUE, index.return = TRUE)$ix
+Rotated_Factors <- Rotated_Factors[sorted_rows,]
+Rotated_Factors[abs(Rotated_Factors) < 0.3]<-NA
+```
+
+```{r}
+show_data <- Rotated_Factors 
+iprint.df(show_data, scale=TRUE)
+```
+* 4.b
+```{r}
+crisis_data = futures_data[as.Date(rownames(futures_data)) > "2007-10-01" & as.Date(rownames(futures_data)) <"2009-03-01",]
+```
+```{r}
+show_data = round(cor(crisis_data),2)
+iprint.df(show_data, scale=TRUE)
+```
+```{r}
+Variance_Explained_Table_results<-PCA(crisis_data, graph=FALSE)
+Variance_Explained_Table<-Variance_Explained_Table_results$eig
+colnames(Variance_Explained_Table)<-c("Eigenvalue", 
+  "Pct of explained variance", "Cumulative pct of explained variance")
+```
+```{r}
+show_data = round(Variance_Explained_Table, 2)
+iprint.df(show_data)
+```
+```{r}
+eigenvalues  <- Variance_Explained_Table[, "Eigenvalue"]
+```
+```{r}
+df           <- cbind(as.data.frame(eigenvalues), c(1:length(eigenvalues)), rep(1, length(eigenvalues)))
+colnames(df) <- c("eigenvalues", "components", "abline")
+iplot.df(melt(df, id="components"))
+```
+
+
+```{r echo=TRUE, tidy=TRUE}
+corused = cor(futures_data[,apply(futures_data!=0,2,sum) > 10, drop=F])
+Rotated_Results<-principal(corused, nfactors=20, rotate="varimax",score=TRUE)
+Rotated_Factors<-round(Rotated_Results$loadings,2)
+Rotated_Factors<-as.data.frame(unclass(Rotated_Factors))
+colnames(Rotated_Factors)<-paste("comp",1:ncol(Rotated_Factors),sep=" ")
+
+sorted_rows <- sort(Rotated_Factors[,1], decreasing = TRUE, index.return = TRUE)$ix
+Rotated_Factors <- Rotated_Factors[sorted_rows,]
+Rotated_Factors[abs(Rotated_Factors) < 0.3]<-NA
+```
+
+```{r}
+show_data <- Rotated_Factors 
+iprint.df(show_data, scale=TRUE)
+```
+5
+The charts above show that in the pre-crisis bull market, 15 principal components had an eigenvalue >1 which accounted for 69.95% of cumulative explained variance. In contrast, in the financial crisis years only 13 principal components have an eigenvalue >1 which accounts for 75.4% of cumulative explained variance. There is also a significant difference between correlations of the comodities or 64 indiceshelp
 *
 *
 *
@@ -230,8 +317,9 @@ How does this compare with **existing CTA products** such as [this one from Soci
 
 **Answers**
 
-*
-*
+* MAfreq sets the windwo from 1-250 with distance by 20 this should be the length of averaging so chaning it will change the output significantly and make the moving average even smoother(if the window is increased). after normalizing the program is iterating data to find the average from the window created and save it into a matrix. this will create an extra sequence of line which will be according to the data or returns provided. 
+
+* As said earlier this changes the output so that the daily returns are effected. 
 *
 *
 *
